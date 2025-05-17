@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} - {{ lesson.course.title }}{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'courses:course_detail' lesson.course.slug %}" class="text-decoration-none">
+                            {{ lesson.course.title }}
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ lesson.title }}</li>
+                </ol>
+            </nav>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h1 class="h2 mb-4">{{ lesson.title }}</h1>
+                    <div class="lesson-content">
+                        {{ lesson.content|safe }}
+                    </div>
+                </div>
+            </div>
+
+            {% if lesson.tests.exists %}
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h2 class="h4 mb-4">Тест по уроку</h2>
+                        {% for test in lesson.tests.all %}
+                            <div class="test-item mb-4">
+                                <h3 class="h5 mb-3">{{ test.title }}</h3>
+                                <p class="text-muted mb-3">{{ test.description }}</p>
+                                <a href="#" class="btn btn-primary">
+                                    <i class="fas fa-tasks me-2"></i>
+                                    Начать тест
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if not progress.completed %}
+                <form method="post" class="text-center">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-check-circle me-2"></i>
+                        Отметить урок как пройденный
+                    </button>
+                </form>
+            {% else %}
+                <div class="alert alert-success text-center">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Вы успешно прошли этот урок!
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 2rem;">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Содержание курса</h5>
+                    <div class="list-group list-group-flush">
+                        {% for course_lesson in lesson.course.lessons.all %}
+                            <a href="{% url 'courses:lesson_detail' lesson.course.slug course_lesson.id %}" 
+                               class="list-group-item list-group-item-action {% if course_lesson == lesson %}active{% endif %}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ course_lesson.title }}</h6>
+                                        <small class="text-muted">Урок {{ forloop.counter }}</small>
+                                    </div>
+                                    {% if user.is_authenticated %}
+                                        {% with lesson_progress=user_progress|filter_lesson:course_lesson %}
+                                            {% if lesson_progress.completed %}
+                                                <i class="fas fa-check-circle text-success"></i>
+                                            {% endif %}
+                                        {% endwith %}
+                                    {% endif %}
+                                </div>
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

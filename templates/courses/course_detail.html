@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load course_tags %}
+
+{% block title %}{{ course.title }} - EduPlatform{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <img src="{{ course.image.url }}" alt="{{ course.title }}" class="img-fluid rounded-4 mb-4">
+            <h1 class="display-4 mb-3">{{ course.title }}</h1>
+            <div class="d-flex align-items-center mb-4">
+                {% if course.teacher.avatar %}
+                    <img src="{{ course.teacher.avatar.url }}" 
+                         alt="{{ course.teacher.username }}" 
+                         class="rounded-circle me-2" 
+                         width="40" height="40">
+                {% else %}
+                    <div class="rounded-circle me-2 bg-light d-flex align-items-center justify-content-center" 
+                         style="width: 40px; height: 40px;">
+                        <i class="fas fa-user text-muted"></i>
+                    </div>
+                {% endif %}
+                <div>
+                    <small class="text-muted">Преподаватель</small>
+                    <div>{{ course.teacher.get_full_name|default:course.teacher.username }}</div>
+                </div>
+            </div>
+            <div class="card border-0 bg-light mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">О курсе</h5>
+                    <p class="card-text">{{ course.description }}</p>
+                </div>
+            </div>
+
+            <h2 class="h3 mb-4">Уроки курса</h2>
+            <div class="list-group mb-4">
+                {% for lesson in course.lessons.all %}
+                    <a href="{% url 'courses:lesson_detail' course.slug lesson.id %}" 
+                       class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-1">{{ lesson.title }}</h5>
+                            <small class="text-muted">Урок {{ forloop.counter }}</small>
+                        </div>
+                        {% if user.is_authenticated %}
+                            {% with progress=user_progress|filter_lesson:lesson %}
+                                {% if progress.completed %}
+                                    <span class="badge bg-success rounded-pill">
+                                        <i class="fas fa-check"></i> Пройдено
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-primary rounded-pill">
+                                        <i class="fas fa-play"></i> Начать
+                                    </span>
+                                {% endif %}
+                            {% endwith %}
+                        {% endif %}
+                    </a>
+                {% empty %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-book fa-3x text-muted mb-3"></i>
+                        <p class="text-muted">Уроки пока не добавлены</p>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card border-0 shadow-sm sticky-top" style="top: 2rem;">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Информация о курсе</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-users text-primary me-2"></i>
+                            {{ course.students.count }} студентов
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-book text-primary me-2"></i>
+                            {{ course.lessons.count }} уроков
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-clock text-primary me-2"></i>
+                            Обновлено {{ course.updated_at|date:"d.m.Y" }}
+                        </li>
+                    </ul>
+                    {% if user.is_authenticated %}
+                        {% if user in course.students.all %}
+                            <div class="alert alert-success mb-0">
+                                <i class="fas fa-check-circle me-2"></i>
+                                Вы записаны на этот курс
+                            </div>
+                        {% else %}
+                            <form method="post" action="{% url 'courses:enroll_course' course.slug %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="fas fa-user-plus me-2"></i>
+                                    Записаться на курс
+                                </button>
+                            </form>
+                        {% endif %}
+                    {% else %}
+                        <div class="alert alert-info mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            <a href="{% url 'users:login' %}" class="alert-link">Войдите</a>, 
+                            чтобы записаться на курс
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
