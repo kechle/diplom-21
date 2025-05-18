@@ -1,47 +1,27 @@
 from django.contrib import admin
-from .models import Course, Lesson, Test, Question, Answer, UserProgress
+from .models import Course, Lesson, Question, UserCourse
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'teacher', 'created_at', 'updated_at', 'get_students_count')
-    list_filter = ('created_at', 'updated_at', 'teacher')
-    search_fields = ('title', 'description', 'teacher__username')
-    prepopulated_fields = {'slug': ('title',)}
-    filter_horizontal = ('students',)
-
-    def get_students_count(self, obj):
-        return obj.students.count()
-    get_students_count.short_description = 'Количество студентов'
+    list_display = ('title', 'is_popular', 'created_at')
+    list_filter = ('is_popular', 'created_at')
+    search_fields = ('title', 'description')
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'order', 'created_at')
-    list_filter = ('course', 'created_at')
-    search_fields = ('title', 'content', 'course__title')
+    list_display = ('title', 'course', 'order')
+    list_filter = ('course',)
+    search_fields = ('title', 'content')
     ordering = ('course', 'order')
-
-@admin.register(Test)
-class TestAdmin(admin.ModelAdmin):
-    list_display = ('title', 'lesson', 'created_at')
-    list_filter = ('lesson__course', 'created_at')
-    search_fields = ('title', 'description', 'lesson__title')
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'test', 'order')
-    list_filter = ('test__lesson__course', 'test')
-    search_fields = ('text', 'test__title')
-    ordering = ('test', 'order')
+    list_display = ('question_text', 'lesson')
+    list_filter = ('lesson',)
+    search_fields = ('question_text',)
 
-@admin.register(Answer)
-class AnswerAdmin(admin.ModelAdmin):
-    list_display = ('text', 'question', 'is_correct')
-    list_filter = ('question__test__lesson__course', 'is_correct')
-    search_fields = ('text', 'question__text')
-
-@admin.register(UserProgress)
-class UserProgressAdmin(admin.ModelAdmin):
-    list_display = ('user', 'lesson', 'completed', 'completed_at')
-    list_filter = ('completed', 'completed_at', 'lesson__course')
-    search_fields = ('user__username', 'lesson__title')
-    readonly_fields = ('completed_at',)
+@admin.register(UserCourse)
+class UserCourseAdmin(admin.ModelAdmin):
+    list_display = ('user', 'course', 'enrolled_at')
+    list_filter = ('enrolled_at',)
+    search_fields = ('user__username', 'course__title')

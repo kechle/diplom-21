@@ -18,11 +18,16 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from django.views.generic import TemplateView
+from courses.views import home, course_detail, lesson_detail
+from users.views import profile, logout_view
 
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name='home.html'), name='home'),
-    path('courses/', include('courses.urls')),
+    path('profile/', profile, name='profile'),
+    path('logout/', logout_view, name='logout'),
+    path('course/<int:course_id>/', course_detail, name='course_detail'),
+    path('lesson/<int:lesson_id>/', lesson_detail, name='lesson_detail'),
     path('users/', include('users.urls')),
+    path('courses/', include('courses.urls')),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

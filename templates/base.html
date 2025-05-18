@@ -140,30 +140,35 @@
     {% block extra_css %}{% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'home' %}">EduPlatform</a>
+            <a class="navbar-brand" href="{% url 'home' %}">Образовательная платформа</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}">Главная</a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'courses:course_list' %}">Курсы</a>
                     </li>
+                </ul>
+                <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:profile' %}">Профиль</a>
+                            <a class="nav-link" href="{% url 'profile' %}">Профиль</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:logout' %}">Выйти</a>
+                            <a class="nav-link" href="{% url 'logout' %}">Выход</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'users:login' %}">Войти</a>
+                            <a class="nav-link" href="{% url 'login' %}">Вход</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link btn btn-primary text-white ms-2" href="{% url 'users:register' %}">Регистрация</a>
+                            <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
                         </li>
                     {% endif %}
                 </ul>

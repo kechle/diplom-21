@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load course_tags %}
 
 {% block title %}{{ lesson.title }} - {{ lesson.course.title }}{% endblock %}
 
@@ -26,21 +27,38 @@
                 </div>
             </div>
 
-            {% if lesson.tests.exists %}
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-body">
-                        <h2 class="h4 mb-4">Тест по уроку</h2>
-                        {% for test in lesson.tests.all %}
-                            <div class="test-item mb-4">
-                                <h3 class="h5 mb-3">{{ test.title }}</h3>
-                                <p class="text-muted mb-3">{{ test.description }}</p>
-                                <a href="#" class="btn btn-primary">
-                                    <i class="fas fa-tasks me-2"></i>
-                                    Начать тест
-                                </a>
+            <h2 class="mt-4">Тест</h2>
+            <form method="post">
+                {% csrf_token %}
+                {% for question in questions %}
+                    <div class="card mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title">Вопрос {{ forloop.counter }}</h5>
+                            <p class="card-text">{{ question.question_text }}</p>
+                            <div class="list-group">
+                                {% for answer in question.answers %}
+                                    <label class="list-group-item">
+                                        <input type="radio" name="question_{{ question.id }}" value="{{ answer }}" class="me-2">
+                                        {{ answer }}
+                                    </label>
+                                {% endfor %}
                             </div>
-                        {% endfor %}
+                        </div>
                     </div>
+                {% empty %}
+                    <p>Вопросы для этого урока пока не добавлены.</p>
+                {% endfor %}
+                
+                {% if questions %}
+                    <button type="submit" class="btn btn-primary">Завершить тест</button>
+                {% endif %}
+            </form>
+
+            {% if test_result %}
+                <div class="alert alert-info text-center mt-4">
+                    <strong>Результат теста:</strong><br>
+                    Правильных ответов: {{ test_result.score }} из {{ test_result.total_questions }}<br>
+                    Процент: {{ test_result.percentage|floatformat:0 }}%
                 </div>
             {% endif %}
 

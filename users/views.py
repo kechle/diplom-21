@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.generic import UpdateView
@@ -9,7 +9,7 @@ from .forms import UserRegisterForm, UserUpdateForm
 from .models import User
 from courses.forms import CourseForm, LessonForm
 from .forms import AddStudentToCourseForm
-from courses.models import Course, Lesson
+from courses.models import Course, Lesson, UserCourse
 from django.db import IntegrityError
 
 def register(request):
@@ -25,15 +25,12 @@ def register(request):
 
 @login_required
 def profile(request):
-    if request.method == 'POST':
-        form = UserUpdateForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Ваш профиль успешно обновлен!')
-            return redirect('users:profile')
-    else:
-        form = UserUpdateForm(instance=request.user)
-    return render(request, 'users/profile.html', {'form': form})
+    user_courses = UserCourse.objects.filter(user=request.user).select_related('course')
+    context = {
+        'user': request.user,
+        'user_courses': user_courses
+    }
+    return render(request, 'users/profile.html', context)
 
 @login_required
 def dashboard(request):
@@ -87,3 +84,7 @@ def admin_dashboard(request):
         'courses': courses,
         'lessons': lessons,
     })
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
