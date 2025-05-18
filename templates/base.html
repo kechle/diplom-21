@@ -158,17 +158,17 @@
                 <ul class="navbar-nav">
                     {% if user.is_authenticated %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'profile' %}">Профиль</a>
+                            <a class="nav-link" href="{% url 'users:profile' %}">Профиль</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Выход</a>
+                            <a class="nav-link" href="{% url 'users:logout' %}">Выход</a>
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Вход</a>
+                            <a class="nav-link" href="{% url 'users:login' %}">Вход</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{% url 'register' %}">Регистрация</a>
+                            <a class="nav-link" href="{% url 'users:register' %}">Регистрация</a>
                         </li>
                     {% endif %}
                 </ul>

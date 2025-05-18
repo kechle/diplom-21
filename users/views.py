@@ -87,4 +87,4 @@ def admin_dashboard(request):
 
 def logout_view(request):
     logout(request)
-    return redirect('home')
+    return redirect(request.META.get('HTTP_REFERER', '/'))
